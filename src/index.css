@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ══════════════════════════════════════════
+   CSS CUSTOM PROPERTIES — semantic tokens
+   Light = default, Dark = .dark override
+══════════════════════════════════════════ */
+@layer base {
+  :root {
+    --bg:       #f4f3ef;
+    --surface:  #eceae4;
+    --card:     #ffffff;
+    --border:   #e2dfd7;
+    --text:     #0d0d0b;
+    --text2:    #3a3930;
+    --muted:    #8c8980;
+    --shadow:   0 1px 4px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.06);
+  }
+
+  .dark {
+    --bg:       #0b0c0e;
+    --surface:  #141619;
+    --card:     #1c1f28;
+    --border:   #252830;
+    --text:     #eceef3;
+    --text2:    #b8bcc8;
+    --muted:    #686e7d;
+    --shadow:   0 1px 4px rgba(0,0,0,.3), 0 4px 20px rgba(0,0,0,.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html {
+    height: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    height: 100%;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-size: 15px;
+    background-color: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  #root { height: 100%; }
+}
+
+/* ══════════════════════════════════════════
+   UTILITY CLASSES — theme-aware
+══════════════════════════════════════════ */
+@layer components {
+  /* Typography */
+  .mono       { font-family: 'Space Mono', 'Courier New', monospace; }
+  .label-xs   { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); display: block; }
+
+  /* Colors — semantic */
+  .text-theme-primary   { color: var(--text); }
+  .text-theme-secondary { color: var(--text2); }
+  .text-theme-muted     { color: var(--muted); }
+  .bg-theme-bg          { background-color: var(--bg); }
+  .bg-theme-surface     { background-color: var(--surface); }
+  .bg-theme-card        { background-color: var(--card); }
+  .border-theme         { border-color: var(--border); }
+
+  /* Card */
+  .t-card {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: var(--shadow);
+  }
+
+  /* Progress bar */
+  .progress-track {
+    height: 6px;
+    background-color: var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  /* Positive / negative */
+  .positive { color: #22c55e; }
+  .negative { color: #ef4444; }
+}
+
+/* ══════════════════════════════════════════
+   SCROLLBAR
+══════════════════════════════════════════ */
+::-webkit-scrollbar       { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
