@@ -68,6 +68,76 @@ function AlertDialog({ open, title, message, onClose }) {
   )
 }
 
+
+/* ── Support QR Dialog ── */
+function SupportQrDialog({ open, onClose }) {
+  if (!open) return null
+
+  const promptPayId = '1-3499-00836-010'
+
+  const copyPromptPayId = async () => {
+    try {
+      await navigator.clipboard?.writeText(promptPayId)
+    } catch (e) {
+      console.warn('[MorePage] Failed to copy PromptPay ID.', e)
+    }
+  }
+
+  return (
+    <>
+      <div className="fixed inset-0 z-[190] bg-black/50" onClick={onClose} />
+      <div
+        className="fixed bottom-0 left-0 right-0 z-[200] max-w-[430px] mx-auto rounded-t-[20px] p-5"
+        style={{ background: 'var(--card)', borderTop: '1px solid var(--border)' }}
+      >
+        <div className="w-10 h-1 rounded-full mx-auto mb-4" style={{ background: 'var(--border)' }} />
+        <h3 className="text-[17px] font-bold mb-1" style={{ color: 'var(--text)' }}>
+          ☕ Support BTC Stacking
+        </h3>
+        <p className="text-[12px] mb-4" style={{ color: 'var(--text2)' }}>
+          If this app helps your BTC journey, you can support future development.
+        </p>
+
+        <div
+          className="rounded-[16px] p-3 mb-3"
+          style={{ background: '#fff', border: '1px solid var(--border)' }}
+        >
+          <img
+            src="/promptpay-qr.jpeg"
+            alt="PromptPay QR code"
+            className="w-full rounded-[12px] block"
+          />
+        </div>
+
+        <div className="text-center mb-4">
+          <p className="text-[10px] uppercase tracking-[0.14em] font-bold mb-1" style={{ color: 'var(--muted)' }}>
+            PromptPay ID
+          </p>
+          <p className="font-mono text-[14px] font-bold" style={{ color: 'var(--text)' }}>
+            {promptPayId}
+          </p>
+          <p className="text-[11px] mt-1" style={{ color: 'var(--muted)' }}>
+            100% optional — the app remains free for everyone.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2.5">
+          <button
+            onClick={onClose}
+            className="py-3 rounded-[12px] text-[14px] font-semibold"
+            style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text2)' }}
+          >Close</button>
+          <button
+            onClick={copyPromptPayId}
+            className="py-3 rounded-[12px] text-[14px] font-bold"
+            style={{ background: 'var(--text)', color: 'var(--card)' }}
+          >Copy ID</button>
+        </div>
+      </div>
+    </>
+  )
+}
+
 /* ── Main Page ── */
 export function MorePage({ state, priceLoading, updatedAt, onRefresh, onRestoreState }) {
   const m          = useMemo(() => computeMetrics(state), [state])
@@ -82,6 +152,7 @@ export function MorePage({ state, priceLoading, updatedAt, onRefresh, onRestoreS
   const [importError,     setImportError]      = useState(null)
   const [importSuccess,   setImportSuccess]    = useState(false)
   const [confirmRestore,  setConfirmRestore]   = useState(null) // parsed backup data
+  const [supportOpen,     setSupportOpen]      = useState(false)
   const fileInputRef = useRef(null)
 
   /* ── CSV Export ── */
@@ -321,6 +392,45 @@ export function MorePage({ state, priceLoading, updatedAt, onRefresh, onRestoreS
           File: <span className="font-mono">btc-stacking-backup-YYYY-MM-DD.json</span>
         </p>
       </Card>
+
+
+      {/* ── Support Development ── */}
+      <Card>
+        <CardHead title="☕ Support BTC Stacking" />
+        <p className="text-[12px] mb-3" style={{ color: 'var(--muted)' }}>
+          If this app helps your BTC journey, you can support future development.
+        </p>
+        <button
+          onClick={() => setSupportOpen(true)}
+          className="w-full py-3 rounded-[12px] text-[14px] font-bold
+                     flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+          style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text)' }}
+        >
+          Show PromptPay QR
+        </button>
+
+        <div className="mt-4 pt-3" style={{ borderTop: '1px solid var(--border)' }}>
+          <p className="text-[12px] font-bold mb-1" style={{ color: 'var(--text)' }}>
+            • Partners &amp; Contact
+          </p>
+          <a
+            href="https://x.com/btcstackingapp"
+            target="_blank"
+            rel="noreferrer"
+            className="text-[12px] font-semibold"
+            style={{ color: '#60a5fa' }}
+          >
+            X: @btcstackingapp
+          </a>
+        </div>
+      </Card>
+
+
+      {/* ── Support PromptPay QR ── */}
+      <SupportQrDialog
+        open={supportOpen}
+        onClose={() => setSupportOpen(false)}
+      />
 
       {/* ── Confirm Restore Dialog ── */}
       <ConfirmDialog
