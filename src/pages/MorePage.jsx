@@ -73,16 +73,6 @@ function AlertDialog({ open, title, message, onClose }) {
 function SupportQrDialog({ open, onClose }) {
   if (!open) return null
 
-  const promptPayId = '1-3499-00836-010'
-
-  const copyPromptPayId = async () => {
-    try {
-      await navigator.clipboard?.writeText(promptPayId)
-    } catch (e) {
-      console.warn('[MorePage] Failed to copy PromptPay ID.', e)
-    }
-  }
-
   return (
     <>
       <div className="fixed inset-0 z-[190] bg-black/50" onClick={onClose} />
@@ -99,40 +89,27 @@ function SupportQrDialog({ open, onClose }) {
         </p>
 
         <div
-          className="rounded-[16px] p-3 mb-3"
+          className="rounded-[16px] p-3 mb-4"
           style={{ background: '#fff', border: '1px solid var(--border)' }}
         >
           <img
-            src="/promptpay-qr.jpeg"
-            alt="PromptPay QR code"
+            src="/promptpay-qr.png"
+            alt="PromptPay QR"
             className="w-full rounded-[12px] block"
           />
         </div>
 
-        <div className="text-center mb-4">
-          <p className="text-[10px] uppercase tracking-[0.14em] font-bold mb-1" style={{ color: 'var(--muted)' }}>
-            PromptPay ID
-          </p>
-          <p className="font-mono text-[14px] font-bold" style={{ color: 'var(--text)' }}>
-            {promptPayId}
-          </p>
-          <p className="text-[11px] mt-1" style={{ color: 'var(--muted)' }}>
-            100% optional — the app remains free for everyone.
-          </p>
-        </div>
+        <p className="text-center text-[11px] mb-4" style={{ color: 'var(--muted)' }}>
+          100% optional — the app remains free for everyone.
+        </p>
 
-        <div className="grid grid-cols-2 gap-2.5">
-          <button
-            onClick={onClose}
-            className="py-3 rounded-[12px] text-[14px] font-semibold"
-            style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text2)' }}
-          >Close</button>
-          <button
-            onClick={copyPromptPayId}
-            className="py-3 rounded-[12px] text-[14px] font-bold"
-            style={{ background: 'var(--text)', color: 'var(--card)' }}
-          >Copy ID</button>
-        </div>
+        <button
+          onClick={onClose}
+          className="w-full py-3 rounded-[12px] text-[14px] font-bold"
+          style={{ background: 'var(--text)', color: 'var(--card)' }}
+        >
+          Close
+        </button>
       </div>
     </>
   )
