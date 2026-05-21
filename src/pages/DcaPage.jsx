@@ -16,7 +16,7 @@ const $$ = (v, d = 0) => {
   return `${s}$${n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d })}`
 }
 
-export function DcaPage({ state, onEditPlan }) {
+export function DcaPage({ state, onEditPlan, onDeleteEntry }) {
   const { settings } = state
   const dcaBtc = useMemo(() => state.dca.reduce((s, x) => s + (+x.btcQty || 0), 0), [state.dca])
   const proj   = useMemo(() => estimateProjection({ settings, dcaBtc }), [settings, dcaBtc])
@@ -240,12 +240,16 @@ export function DcaPage({ state, onEditPlan }) {
             .slice(0, 20)
             .map((x, i) => (
               <EntryRow
-                key={i} kind="dca" badge="DCA"
+                key={x._id || i} kind="dca" badge="DCA"
                 title={fmtDate(x.date)}
                 sub={(x.note || x.source || '').replace(/, 1m candle/g, '').slice(0, 40)}
                 val={`${x.btcQty >= 0 ? '+' : ''}${fmtBtc(x.btcQty)} BTC`}
                 subVal={$$(x.price, 0)}
                 valClass={x.btcQty >= 0 ? 'positive' : 'negative'}
+                onDelete={onDeleteEntry ? () => {
+                  if (window.confirm('Delete this entry?'))
+                    onDeleteEntry('dca', x._id || x)
+                } : undefined}
               />
             ))}
         </div>

@@ -14,7 +14,7 @@ const $$ = (v, d = 2) => {
   return `${s}$${n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d })}`
 }
 
-export function FuturesPage({ state }) {
+export function FuturesPage({ state, onDeleteEntry }) {
   const m = useMemo(() => computeMetrics(state), [state])
 
   const chartPts = useMemo(() => {
@@ -56,12 +56,16 @@ export function FuturesPage({ state }) {
             .slice(0, 20)
             .map((x, i) => (
               <EntryRow
-                key={i} kind="futures" badge="FUT"
+                key={x._id || i} kind="futures" badge="FUT"
                 title={fmtDate(x.dateClose)}
                 sub={`${x.side} ${x.leverage || ''} · ${x.mode}${x.mistakeTag ? ' · ' + x.mistakeTag : ''}`}
                 val={$$(x.pnlUsdt)}
                 subVal={x.roi != null ? fmtPct(x.roi, 2) : ''}
                 valClass={x.pnlUsdt >= 0 ? 'positive' : 'negative'}
+                onDelete={onDeleteEntry ? () => {
+                  if (window.confirm('Delete this entry?'))
+                    onDeleteEntry('futures', x._id || x)
+                } : undefined}
               />
             ))}
           {!state.futures.length && (

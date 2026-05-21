@@ -68,55 +68,8 @@ function AlertDialog({ open, title, message, onClose }) {
   )
 }
 
-
-/* ── Support QR Dialog ── */
-function SupportQrDialog({ open, onClose }) {
-  if (!open) return null
-
-  return (
-    <>
-      <div className="fixed inset-0 z-[190] bg-black/50" onClick={onClose} />
-      <div
-        className="fixed bottom-0 left-0 right-0 z-[200] max-w-[430px] mx-auto rounded-t-[20px] p-5"
-        style={{ background: 'var(--card)', borderTop: '1px solid var(--border)' }}
-      >
-        <div className="w-10 h-1 rounded-full mx-auto mb-4" style={{ background: 'var(--border)' }} />
-        <h3 className="text-[17px] font-bold mb-1" style={{ color: 'var(--text)' }}>
-          ☕ Support BTC Stacking
-        </h3>
-        <p className="text-[12px] mb-4" style={{ color: 'var(--text2)' }}>
-          If this app helps your BTC journey, you can support future development.
-        </p>
-
-        <div
-          className="rounded-[16px] p-3 mb-4"
-          style={{ background: '#fff', border: '1px solid var(--border)' }}
-        >
-          <img
-            src="/promptpay-qr.png"
-            alt="PromptPay QR"
-            className="w-full rounded-[12px] block"
-          />
-        </div>
-
-        <p className="text-center text-[11px] mb-4" style={{ color: 'var(--muted)' }}>
-          100% optional — the app remains free for everyone.
-        </p>
-
-        <button
-          onClick={onClose}
-          className="w-full py-3 rounded-[12px] text-[14px] font-bold"
-          style={{ background: 'var(--text)', color: 'var(--card)' }}
-        >
-          Close
-        </button>
-      </div>
-    </>
-  )
-}
-
 /* ── Main Page ── */
-export function MorePage({ state, priceLoading, updatedAt, onRefresh, onRestoreState }) {
+export function MorePage({ state, priceLoading, updatedAt, onRefresh, onRestoreState, onDeleteEntry }) {
   const m          = useMemo(() => computeMetrics(state), [state])
   const thb        = m.price * m.usdthb
   const dipCap     = state.dip.reduce((s, x)  => s + Math.abs(+x.usdtAmount  || 0), 0)
@@ -129,7 +82,6 @@ export function MorePage({ state, priceLoading, updatedAt, onRefresh, onRestoreS
   const [importError,     setImportError]      = useState(null)
   const [importSuccess,   setImportSuccess]    = useState(false)
   const [confirmRestore,  setConfirmRestore]   = useState(null) // parsed backup data
-  const [supportOpen,     setSupportOpen]      = useState(false)
   const fileInputRef = useRef(null)
 
   /* ── CSV Export ── */
@@ -279,11 +231,15 @@ export function MorePage({ state, priceLoading, updatedAt, onRefresh, onRestoreS
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12 }}
              className="[&>*:last-child]:border-b-0">
           {[...state.dip].sort((a, b) => sortDesc(a, b, 'date')).slice(0, 10).map((x, i) => (
-            <EntryRow key={i} kind="dip" badge="DIP"
+            <EntryRow key={x._id || i} kind="dip" badge="DIP"
               title={fmtDate(x.date)} sub={x.note || x.source || ''}
               val={`${x.btcQty >= 0 ? '+' : ''}${fmtBtc(x.btcQty)} BTC`}
               subVal={$$(x.price, 0)}
               valClass={x.btcQty >= 0 ? 'positive' : 'negative'}
+              onDelete={onDeleteEntry ? () => {
+                if (window.confirm('Delete this entry?'))
+                  onDeleteEntry('dip', x._id || x)
+              } : undefined}
             />
           ))}
           {!state.dip.length && (
@@ -304,11 +260,15 @@ export function MorePage({ state, priceLoading, updatedAt, onRefresh, onRestoreS
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12 }}
              className="[&>*:last-child]:border-b-0">
           {[...state.grid].sort((a, b) => sortDesc(a, b, 'dateEnd')).slice(0, 8).map((x, i) => (
-            <EntryRow key={i} kind="grid" badge="GRD"
+            <EntryRow key={x._id || i} kind="grid" badge="GRD"
               title={fmtDate(x.dateEnd)} sub={`${x.gridType || ''} · ${x.mode || ''}`}
               val={$$(x.netProfitUsdt)}
               subVal={fmtPct(x.roi, 2)}
               valClass={x.netProfitUsdt >= 0 ? 'positive' : 'negative'}
+              onDelete={onDeleteEntry ? () => {
+                if (window.confirm('Delete this entry?'))
+                  onDeleteEntry('grid', x._id || x)
+              } : undefined}
             />
           ))}
           {!state.grid.length && (
@@ -369,45 +329,6 @@ export function MorePage({ state, priceLoading, updatedAt, onRefresh, onRestoreS
           File: <span className="font-mono">btc-stacking-backup-YYYY-MM-DD.json</span>
         </p>
       </Card>
-
-
-      {/* ── Support Development ── */}
-      <Card>
-        <CardHead title="☕ Support BTC Stacking" />
-        <p className="text-[12px] mb-3" style={{ color: 'var(--muted)' }}>
-          If this app helps your BTC journey, you can support future development.
-        </p>
-        <button
-          onClick={() => setSupportOpen(true)}
-          className="w-full py-3 rounded-[12px] text-[14px] font-bold
-                     flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
-          style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text)' }}
-        >
-          Show PromptPay QR
-        </button>
-
-        <div className="mt-4 pt-3" style={{ borderTop: '1px solid var(--border)' }}>
-          <p className="text-[12px] font-bold mb-1" style={{ color: 'var(--text)' }}>
-            • Partners &amp; Contact
-          </p>
-          <a
-            href="https://x.com/btcstackingapp"
-            target="_blank"
-            rel="noreferrer"
-            className="text-[12px] font-semibold"
-            style={{ color: '#60a5fa' }}
-          >
-            X: @btcstackingapp
-          </a>
-        </div>
-      </Card>
-
-
-      {/* ── Support PromptPay QR ── */}
-      <SupportQrDialog
-        open={supportOpen}
-        onClose={() => setSupportOpen(false)}
-      />
 
       {/* ── Confirm Restore Dialog ── */}
       <ConfirmDialog
