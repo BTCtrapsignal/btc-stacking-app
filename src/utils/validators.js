@@ -52,6 +52,14 @@ function safeStr(val, maxLen = 200, fallback = '') {
   return val.trim().slice(0, maxLen) || fallback
 }
 
+// ── _id passthrough ──────────────────────────────────────────────────────────
+
+/** Preserve existing _id or leave undefined (will be stamped by addEntry). */
+function keepId(raw, out) {
+  if (raw && typeof raw._id === 'string' && raw._id.length > 0) out._id = raw._id
+  return out
+}
+
 // ── Per-type entry sanitizers ─────────────────────────────────────────────────
 
 /**
@@ -65,7 +73,7 @@ export function sanitizeDcaEntry(raw) {
     console.warn('[validators] DCA entry rejected: invalid btcQty', raw)
     return null
   }
-  return {
+  return keepId(raw, {
     date:        safeDate(raw.date),
     type:        safeStr(raw.type, 10, 'BUY'),
     source:      safeStr(raw.source, 100, ''),
@@ -75,7 +83,7 @@ export function sanitizeDcaEntry(raw) {
     note:        safeStr(raw.note, 300, ''),
     location:    safeStr(raw.location, 100, ''),
     strategy:    safeStr(raw.strategy, 50, 'DCA'),
-  }
+  })
 }
 
 // Dip entries share the same shape as DCA
@@ -96,7 +104,7 @@ export function sanitizeFuturesEntry(raw) {
     console.warn('[validators] Futures entry rejected: invalid pnlUsdt', raw)
     return null
   }
-  return {
+  return keepId(raw, {
     dateOpen:   safeDate(raw.dateOpen),
     dateClose:  safeDate(raw.dateClose),
     symbol:     safeStr(raw.symbol, 20, 'BTCUSDT'),
@@ -110,7 +118,7 @@ export function sanitizeFuturesEntry(raw) {
     mistakeTag: safeStr(raw.mistakeTag, 200, null) || null,
     notes:      safeStr(raw.notes, 500, null) || null,
     strategy:   safeStr(raw.strategy, 50, 'Futures'),
-  }
+  })
 }
 
 /**
@@ -124,7 +132,7 @@ export function sanitizeGridEntry(raw) {
     console.warn('[validators] Grid entry rejected: invalid netProfitUsdt', raw)
     return null
   }
-  return {
+  return keepId(raw, {
     dateStart:     safeDate(raw.dateStart),
     dateEnd:       safeDate(raw.dateEnd),
     gridType:      safeStr(raw.gridType, 20, 'Spot'),
@@ -134,7 +142,7 @@ export function sanitizeGridEntry(raw) {
     roi:           safeNum(raw.roi, 0),
     note:          safeStr(raw.note, 300, ''),
     strategy:      safeStr(raw.strategy, 50, 'Grid Bot'),
-  }
+  })
 }
 
 // ── Array sanitizer ───────────────────────────────────────────────────────────
