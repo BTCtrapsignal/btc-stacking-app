@@ -26,7 +26,7 @@ const PAGE_TITLES = {
 }
 
 export default function App() {
-  const { state, updateSettings, addEntry, restoreState } = useAppState()
+  const { state, updateSettings, addEntry, deleteEntry, restoreState } = useAppState()
   const { isDark, toggle: toggleTheme }     = useTheme()
 
   const VALID_TABS = ['home', 'dca', 'futures', 'triggers', 'more']
@@ -107,11 +107,12 @@ export default function App() {
       {/* ── Page content ── */}
       <PageContainer>
         {tab === 'home'     && <HomePage     state={state} onEditGoal={openGoal} onRefresh={refreshPrice} />}
-        {tab === 'dca'      && <DcaPage      state={state} onEditPlan={openPlan} />}
-        {tab === 'futures'  && <FuturesPage  state={state} />}
+        {tab === 'dca'      && <DcaPage      state={state} onEditPlan={openPlan} onDeleteEntry={deleteEntry} />}
+        {tab === 'futures'  && <FuturesPage  state={state} onDeleteEntry={deleteEntry} />}
         {tab === 'triggers' && <TriggersPage state={state} />}
         {tab === 'more'     && (
           <MorePage
+            onDeleteEntry={deleteEntry}
             state={state}
             priceLoading={priceLoading}
             updatedAt={updatedAt}
