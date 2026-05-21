@@ -18,6 +18,11 @@ const ENTRY_SANITIZERS = {
   grid:    sanitizeGridEntry,
 }
 
+/** Generate a stable unique id for new entries. */
+function genId(type) {
+  return `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
+}
+
 const STORAGE_KEY     = 'btc-stack-v5'
 const STORAGE_VERSION = 2
 
@@ -135,11 +140,24 @@ export function useAppState() {
         console.warn(`[useAppState] addEntry(${type}): entry rejected by validator`, entry)
         return
       }
+      if (!clean._id) clean._id = genId(type)
       setState(s => ({ ...s, [type]: [clean, ...s[type]] }))
     } else {
       // Unknown type (e.g. future extension) — pass through unchanged
-      setState(s => ({ ...s, [type]: [entry, ...s[type]] }))
+      const e = { ...entry }
+      if (!e._id) e._id = genId(type)
+      setState(s => ({ ...s, [type]: [e, ...s[type]] }))
     }
+  }, [])
+
+  const deleteEntry = useCallback((type, id) => {
+    setState(s => {
+      const arr = s[type]
+      if (!Array.isArray(arr)) return s
+      // Delete by _id if available, fallback to reference equality
+      const next = arr.filter(e => e._id ? e._id !== id : e !== id)
+      return { ...s, [type]: next }
+    })
   }, [])
 
   const updateTriggers = useCallback((triggers) => {
@@ -159,5 +177,5 @@ export function useAppState() {
     })
   }, [])
 
-  return { state, updateSettings, addEntry, updateTriggers, restoreState }
+  return { state, updateSettings, addEntry, deleteEntry, updateTriggers, restoreState }
 }
