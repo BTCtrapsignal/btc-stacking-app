@@ -1,7 +1,10 @@
 /**
  * EntryRow — single row in an activity/entry list.
  * Theme-aware via CSS variables.
+ * onDelete (optional): called when trash icon is tapped.
  */
+import { Trash2 } from 'lucide-react'
+
 const BADGE = {
   dca:     { bg: 'rgba(247,147,26,0.12)', color: '#f7931a', border: 'rgba(247,147,26,0.2)' },
   futures: { bg: 'rgba(34,197,94,0.12)',  color: '#22c55e', border: 'rgba(34,197,94,0.2)' },
@@ -10,7 +13,7 @@ const BADGE = {
   default: { bg: 'var(--surface)',         color: 'var(--muted)', border: 'var(--border)' },
 }
 
-export function EntryRow({ kind = 'default', badge, title, sub, val, subVal, valClass = '' }) {
+export function EntryRow({ kind = 'default', badge, title, sub, val, subVal, valClass = '', onDelete }) {
   const bs = BADGE[kind] || BADGE.default
   return (
     <div
@@ -30,10 +33,23 @@ export function EntryRow({ kind = 'default', badge, title, sub, val, subVal, val
           <p className="text-[11px] truncate" style={{ color: 'var(--muted)' }}>{sub}</p>
         </div>
       </div>
-      <div className="text-right shrink-0">
-        <span className={`block font-mono text-[13px] font-bold tracking-tight ${valClass}`}>{val}</span>
-        {subVal && (
-          <span className="block font-mono text-[10px] mt-0.5" style={{ color: 'var(--muted)' }}>{subVal}</span>
+      <div className="flex items-center gap-1.5 shrink-0">
+        <div className="text-right">
+          <span className={`block font-mono text-[13px] font-bold tracking-tight ${valClass}`}>{val}</span>
+          {subVal && (
+            <span className="block font-mono text-[10px] mt-0.5" style={{ color: 'var(--muted)' }}>{subVal}</span>
+          )}
+        </div>
+        {onDelete && (
+          <button
+            onClick={onDelete}
+            style={{ background: 'none', border: 'none', cursor: 'pointer',
+                     color: 'var(--muted)', padding: '4px', lineHeight: 1,
+                     opacity: 0.5, flexShrink: 0 }}
+            title="Delete entry"
+          >
+            <Trash2 size={12} />
+          </button>
         )}
       </div>
     </div>
